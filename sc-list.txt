@@ -1,3 +1,4 @@
 ASPLOAD.int
 ITSWS.pkg
 User.ArrayOfNumericArray.cls
+User.NumericArray.cls
