@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITSWS.ITSReturnStream">
+<ClassType/>
+<ProcedureBlock>0</ProcedureBlock>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63441,36102</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Parameter name="XMLNAME">
+<Default>ITSReturn</Default>
+</Parameter>
+
+<Parameter name="XMLSEQUENCE">
+<Default>1</Default>
+</Parameter>
+
+<Property name="ErrorCode">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="2147483647"/>
+<Parameter name="MINVAL" value="-2147483648"/>
+<Parameter name="XMLNAME" value="ErrorCode"/>
+</Property>
+
+<Property name="Response">
+<Type>%GlobalCharacterStream</Type>
+<Parameter name="XMLNAME" value="Response"/>
+</Property>
+</Class>
+</Export>

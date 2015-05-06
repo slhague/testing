@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITSWS.Zip">
+<Description>
+</Description>
+<Super>%Persistent</Super>
+<TimeCreated>63246,64126.569281</TimeCreated>
+
+<Method name="ZipStream">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pStream:%Stream.Object,*pZipped:%Boolean</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set tStatus = $$$OK
+    Try {
+        Set pZipped = 0
+        Set tIO = $IO
+        Set tRestoreBackup = 0
+        Set tTempFileOpen = 0
+        
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+        // Set up a backup stream so we have the content if there is a problem during the zip process
+        Set tBackupStream = ##class(%Stream.TmpBinary).%New()
+        Set tStatus = tBackupStream.CopyFrom(pStream)
+        If $$$ISERR(tStatus) Quit
+        Set tRestoreBackup = 1
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+        
+        // Open a temp file with GZIP enabled and RAW encoding, then write the stream data to the file
+        Set tTempFile = ##class(%Library.File).TempFilename()
+        Open tTempFile:("WUNK\RAW\":::/GZIP=1:/NOXY=1:/OBUFSIZE=32768):0
+        If '$Test {
+            Set tStatus = $$$ERROR($$$GeneralError,"Unable to open temporary file '"_tTempFile_"')")
+            Quit
+        }
+        Set tTempFileOpen = 1
+        Use tTempFile
+        Set tStatus = pStream.OutputToDevice()
+        Use tIO
+        Close tTempFile
+        Set tTempFileOpen = 0
+        
+        // Create a temp stream to read the data back into our original stream
+        Set tBinStream = ##class(%Stream.FileBinary).%New()
+        Set tStatus = tBinStream.FilenameSet(tTempFile)
+        If $$$ISERR(tStatus) Quit
+        // NOTE: RemoveOnClose may not exist in all versions of Cache/Ensemble
+        Set tBinStream.RemoveOnClose = 1
+        Set tStatus = pStream.Clear()
+        If $$$ISERR(tStatus) Quit
+        Set tStatus = pStream.CopyFrom(tBinStream)
+        If $$$ISERR(tStatus) Quit
+        Set pZipped = 1
+        Set tRestoreBackup = 0
+        Kill tBinStream
+        
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+    }
+    Catch ex {
+        Set tStatus = ex.AsStatus()
+    }
+    If (tIO '= $IO) Use tIO
+    If tTempFileOpen Close tTempFile
+    If ($get(tTempFile) '= "") && ##class(%Library.File).Exists(tTempFile) Do ##class(%Library.File).Delete(tTempFile)
+    If $$$ISERR(tStatus) && $get(tRestoreBackup) && $IsObject($get(tBackupStream)) {
+        Set tStatus1 = pStream.Clear()
+        Set tStatus1 = $$$ADDSC(tStatus1,pStream.CopyFrom(tBackupStream))
+        Set tStatus = $$$ADDSC(tStatus,tStatus1)
+    }
+    Quit tStatus
+]]></Implementation>
+</Method>
+
+<Method name="UnzipStream">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pStream:%Stream.Object,*pUnzipped:%Boolean</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set tStatus = $$$OK
+    Try {
+        Set pUnzipped = 0
+        Set tIO = $IO
+        Set tRestoreBackup = 0
+        Set tTempFileOpen = 0
+        
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+        // Set up a backup stream so we have the content if there is a problem during the unzipping process
+        Set tBackupStream = ##class(%Stream.TmpBinary).%New()
+        Set tStatus = tBackupStream.CopyFrom(pStream)
+        If $$$ISERR(tStatus) Quit
+        Set tRestoreBackup = 1
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+        
+        // Open a temp file with GZIP disabled and RAW encoding, then write the stream data to the file
+        Set tTempFile = ##class(%Library.File).TempFilename()
+        Open tTempFile:("WUNK\RAW\":::/GZIP=0:/NOXY=1:/OBUFSIZE=32768):0
+        If '$Test {
+            Set tStatus = $$$ERROR($$$GeneralError,"Unable to open temporary file '"_tTempFile_"' for write)")
+            Quit
+        }
+        Set tTempFileOpen = 1
+        Use tTempFile
+        Set tStatus = pStream.OutputToDevice()
+        If $$$ISERR(tStatus) Quit
+        Close tTempFile
+        Set tTempFileOpen = 0
+        Set tStatus = pStream.Clear()
+        If $$$ISERR(tStatus) Quit
+        
+        // Reopen the temp file with GZIP enabled and RAW encoding, then read the stream data from the file
+        Open tTempFile:("RUK\RAW\":::/GZIP=1:/NOXY=1):0
+        If '$Test {
+            Set tStatus = $$$ERROR($$$GeneralError,"Unable to open temporary file '"_tTempFile_"' for read")
+            Quit
+        }
+        Set tTempFileOpen = 1
+        
+        // Change the end-of-file handling mode to avoid throwing an exception when we reach the EOF
+        Set tEOFMode = $system.Process.SetZEOF(1)
+        Try {
+            Use tTempFile
+            For  {
+                Read chunk:0 If chunk="" Quit
+                Set tStatus = pStream.Write(chunk)
+                If $$$ISERR(tStatus) Quit
+            }
+        }
+        Catch innerEx {
+            Set tStatus = innerEx.AsStatus()
+        }
+        // Reset the end-of-file mode
+        Do $system.Process.SetZEOF(tEOFMode)
+        If $$$ISERR(tStatus) Quit
+        Close tTempFile
+        Set tTempFileOpen = 0
+        Set pUnzipped = 1
+        Set tRestoreBackup = 0
+        
+        Set tStatus = pStream.Rewind()
+        If $$$ISERR(tStatus) Quit
+    }
+    Catch ex {
+        Set tStatus = ex.AsStatus()
+    }
+    If (tIO '= $IO) Use tIO
+    If tTempFileOpen Close tTempFile
+    If ($get(tTmpFile) '= "") && ##class(%Library.File).Exists(tTempFile) Do ##class(%Library.File).Delete(tTempFile)
+    If $$$ISERR(tStatus) && $get(tRestoreBackup) && $IsObject($get(tBackupStream)) {
+        Set tStatus1 = pStream.Clear()
+        Set tStatus1 = $$$ADDSC(tStatus1,pStream.CopyFrom(tBackupStream))
+        Set tStatus = $$$ADDSC(tStatus,tStatus1)
+    }
+    Quit tStatus
+]]></Implementation>
+</Method>
+</Class>
+</Export>

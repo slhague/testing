@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITSWS.PatienResponsibilityEstimatorAPI">
+<Super>%RegisteredObject,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeCreated>63631,41016.29477</TimeCreated>
+
+<Parameter name="Server">
+<Default>https://api.emdeon.com</Default>
+</Parameter>
+
+<Parameter name="Port">
+<Default>443</Default>
+</Parameter>
+
+<Parameter name="Https">
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="SSLConfiguration">
+<Default>ITSWS</Default>
+</Parameter>
+
+<Method name="GetEstimate">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Net.HttpRequest</ReturnType>
+<Implementation><![CDATA[
+	
+ Set request = ##class(%Net.HttpRequest).%New()
+ 		
+ Set request.Server = ..%GetParameter("Server")
+ Set request.Port = ..%GetParameter("Port")
+ Set request.Https = ..%GetParameter("Https")
+ Set request.SSLConfiguration = ..%GetParameter("SSLConfiguration")
+ Set requestStream = ##class(%GlobalBinaryStream).%New()	
+ Set request.EntityBody = requestStream           
+		
+ quit request
+]]></Implementation>
+</Method>
+
+<Method name="Estimate">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>UserName:%String,Password:%String</FormalSpec>
+<ReturnType>%ArrayOfDataTypes</ReturnType>
+<Implementation><![CDATA[
+
+ Set sc = $$$OK
+			
+ Set request = ..GetEstimate()
+ Do request.SetHeader("wsUsername",UserName)
+ Do request.SetHeader("wsPassword",Password)
+ //Do request.InsertParam("access_token", AccessToken)
+ Do request.Get("/rcm/pre/cert/estimate")			
+ Quit:$System.Status.IsError(sc)
+			
+ Set responseStream = ##class(%Stream.GlobalBinary).%New() 
+ Set response = request.HttpResponse.Data.Read()			
+ Set returnEstimate = ##class(ITSWS.CacheJSON).Decode(response)
+ Quit:$System.Status.IsError(sc)
+ 
+ Quit returnEstimate
+]]></Implementation>
+</Method>
+</Class>
+</Export>

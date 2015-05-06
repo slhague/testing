@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITSWS.ITSWSSoap5Stream">
+<ClassType/>
+<ProcedureBlock>0</ProcedureBlock>
+<Super>%SOAP.WebClient</Super>
+<TimeCreated>63441,36102</TimeCreated>
+
+<Parameter name="LOCATION">
+<Description>
+This is the URL used to access the web service.</Description>
+<Default>http://127.0.0.1:8085/ITS/itsws.asmx</Default>
+</Parameter>
+
+<Parameter name="NAMESPACE">
+<Description>
+This is the namespace used by the Service</Description>
+<Default>https://ITSWebService.emdeon.com/</Default>
+</Parameter>
+
+<Parameter name="SERVICENAME">
+<Description>
+This is the name of the Service</Description>
+<Default>ITSWS</Default>
+</Parameter>
+
+<Method name="Authenticate">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturn</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("Authenticate").Invoke(##this,"https://ITSWebService.emdeon.com/Authenticate",.sUserID,.sPassword)
+]]></Implementation>
+</Method>
+
+<Method name="ChangePassword">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String,sNewPassword:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturn</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("ChangePassword").Invoke(##this,"https://ITSWebService.emdeon.com/ChangePassword",.sUserID,.sPassword,.sNewPassword)
+]]></Implementation>
+</Method>
+
+<Method name="GetFile">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String,sMessageType:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturnStream</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("GetFile").Invoke(##this,"https://ITSWebService.emdeon.com/GetFile",.sUserID,.sPassword,.sMessageType)
+]]></Implementation>
+</Method>
+
+<Method name="PutFile">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String,sMessageType:%String,sEncodedPutFile:%GlobalCharacterStream</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturnStream</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("PutFile").Invoke(##this,"https://ITSWebService.emdeon.com/PutFile",.sUserID,.sPassword,.sMessageType,.sEncodedPutFile)
+]]></Implementation>
+</Method>
+
+<Method name="PutFileExt">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String,sMessageType:%String,sFileName:%String,sEncodedPutFile:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturn</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("PutFileExt").Invoke(##this,"https://ITSWebService.emdeon.com/PutFileExt",.sUserID,.sPassword,.sMessageType,.sFileName,.sEncodedPutFile)
+]]></Implementation>
+</Method>
+
+<Method name="SendRequest">
+<Final>1</Final>
+<FormalSpec>sUserID:%String,sPassword:%String,sMessageType:%String,sEncodedRequest:%String</FormalSpec>
+<ProcedureBlock>1</ProcedureBlock>
+<ReturnType>ITSWS.ITSReturn</ReturnType>
+<WebMethod>1</WebMethod>
+<SoapBindingStyle>document</SoapBindingStyle>
+<SoapBodyUse>literal</SoapBodyUse>
+<Implementation><![CDATA[ Quit ..WebMethod("SendRequest").Invoke(##this,"https://ITSWebService.emdeon.com/SendRequest",.sUserID,.sPassword,.sMessageType,.sEncodedRequest)
+]]></Implementation>
+</Method>
+</Class>
+</Export>

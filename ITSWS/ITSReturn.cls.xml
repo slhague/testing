@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="ITSWS.ITSReturn">
+<Description>
+Created from: itsws.asmx</Description>
+<ClassType/>
+<ProcedureBlock>0</ProcedureBlock>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63106,60977</TimeCreated>
+<Inheritance>right</Inheritance>
+
+<Parameter name="XMLNAME">
+<Default>ITSReturn</Default>
+</Parameter>
+
+<Parameter name="XMLSEQUENCE">
+<Default>1</Default>
+</Parameter>
+
+<Property name="ErrorCode">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="2147483647"/>
+<Parameter name="MINVAL" value="-2147483648"/>
+<Parameter name="XMLNAME" value="ErrorCode"/>
+</Property>
+
+<Property name="Response">
+<Type>%String</Type>
+<Parameter name="TRUNCATE" value="1"/>
+<Parameter name="XMLNAME" value="Response"/>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+//Property Response As %GlobalCharacterStream(XMLNAME = "Response");
+
+]]></Content>
+</UDLText>
+</Class>
+</Export>
