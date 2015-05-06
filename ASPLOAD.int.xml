@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Routine name="ASPLOAD" type="INT" languagemode="0"><![CDATA[
+ASPLOAD ;Install AUTOUPDATE;04/07/2015 12:05:26;26JUN2008  08:04;SLH
+ ; ADS Corp. Copyright
+ ;
+ ; This routine along with 'W' Utilities will load and install
+ ; files needed for loading/updating AUTOUPDATE
+ d INT^%DIR,NSP^%DIR s dir=%DIR
+ w !,"Default path is ",%SYSDIR
+ s path=%SYSDIR
+ d path q:'ok
+ i chg d newpath q:'ok
+ w !,"Please place current version of AUTOUP.RSA"
+ w !,"in the "_path," directory"
+ r !,"Press Enter start loading file ",ok q:ok="^"
+ d checkfile(path_"AUTOUP.RSA") q:'ok
+ d loadrtn(path)
+ S NS=$ZU(5)
+ w !,"AUTOUPDATE loaded in ",NS
+ d  zn NS
+ . f NAM=1:1:$zu(90,0) s NNAM=$zu(90,2,0,NAM) I NNAM?1"P"8N s NAM(NNAM)=""
+ . s NAM=""  f  s NAM=$o(NAM(NAM)) q:NAM=""  d
+ .. zn NAM d loadrtn(path)
+ .. w !,"AUTOUPDATE loaded in ",NAM
+ q
+loadrtn(path) ; Cache Restore routine file/Premier
+ ; rload^Wr(file,format,selection,over,compile,syntax,backup,showstat,langmode,pasting)
+ ; $System.OBJ.Load(file,"CF")
+ ; $System.OBJ.ShowFlags()
+ w !,"Loading new routines, please wait...",!
+ s tmp=$P($ZV,") ",2)
+ i tmp<5 d rload^%Wr(path_"AUTOUP.RSA","Cache","*",2,1,0,0,1)
+ i tmp>4.99 d $System.OBJ.Load(path_"AUTOUP.RSA","CF")
+ q
+checkfile(file)
+ s ok=$$EXIST^DFILE(file) i ok q ok
+ w !,"Can't open file "_file
+ f  q:ok  r !,"Press Enter to try again ",try q:try="^"  d
+ . s ok=$$EXIST^DFILE(file)
+ q ok 
+path ;Change Path
+ s ok=0 f  q:ok  r !,"Change path (Y/N): ",chg q:chg="^"  d
+ . i chg?1A,"YyNn"[chg s chg=$s("Yy"[chg:1,1:0) s ok=1 q 
+ . w !,"Invalid entry (enter Y or N)"
+ q
+newpath ;New Path
+ S UNIX=$S($ZV["UNIX":1,1:0),DELIM=$S(UNIX:"/",1:"\")
+ s ok=0 f  q:ok  r !,"New Path: ",path q:path="^"  d
+ . i path]"" s len=$l(path) s:$e(path,len)'=DELIM path=path_DELIM  s ok=1 q
+ . w !,"Entry required" 
+ q
+]]></Routine>
+</Export>
