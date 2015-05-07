@@ -50,5 +50,11 @@ newpath ;New Path
  . i path]"" s len=$l(path) s:$e(path,len)'=DELIM path=path_DELIM  s ok=1 q
  . w !,"Entry required" 
  q
+newerpath ;New Path
+ S UNIX=$S($ZV["UNIX":1,1:0),DELIM=$S(UNIX:"/",1:"\")
+ s ok=0 f  q:ok  r !,"New Path: ",path q:path="^"  d
+ . i path]"" s len=$l(path) s:$e(path,len)'=DELIM path=path_DELIM  s ok=1 q
+ . w !,"Entry required" 
+ q
 ]]></Routine>
 </Export>
